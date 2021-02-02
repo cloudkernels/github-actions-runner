@@ -2,7 +2,7 @@
 #FROM quay.io/evryfs/base-ubuntu:focal-20201106
 FROM nubificus/vaccel-deps:latest
 
-ARG RUNNER_VERSION=2.275.1
+ARG RUNNER_VERSION=2.276.1
 
 # This the release tag of virtual-environments: https://github.com/actions/virtual-environments/releases
 ARG VIRTUAL_ENVIRONMENT_VERSION=ubuntu18/20200817.1
@@ -29,7 +29,7 @@ RUN apt-get update && \
 # Update git.
 RUN add-apt-repository -y ppa:git-core/ppa && \
     apt-get update && \
-    apt-get -y install --no-install-recommends git=1:2.29.* && \
+    apt-get -y install --no-install-recommends git && \
     apt-get -y clean && \
     rm -rf /var/cache/apt /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -51,7 +51,7 @@ RUN install-from-virtual-env docker-compose
 RUN install-from-virtual-env nodejs
 
 # Install runner and its dependencies.
-RUN useradd -mr -d /home/runner -G sudo runner && \
+RUN useradd -mr -d /home/runner -G sudo -u 1000 runner && \
     curl -sL "https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz" | tar xzvC /home/runner && \
     /home/runner/bin/installdependencies.sh
 
