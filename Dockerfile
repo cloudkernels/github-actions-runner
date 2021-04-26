@@ -2,6 +2,8 @@ FROM quay.io/evryfs/base-ubuntu:focal-20210401
 
 ARG RUNNER_VERSION=2.278.0
 
+ARG RUNNER_VERSION=2.277.1
+
 # This the release tag of virtual-environments: https://github.com/actions/virtual-environments/releases
 ARG UBUNTU_VERSION=2004
 ARG VIRTUAL_ENVIRONMENT_VERSION=ubuntu20/20201210.0
@@ -18,6 +20,9 @@ RUN apt-get update && \
     software-properties-common=0.98.* \
     gnupg-agent=2.2.* \
     openssh-client=1:8.* \
+    curl \
+    build-essential \
+    clang libclang-dev llvm-dev ssh iproute2 iputils-ping \
     make=4.*\
     jq=1.* && \
     apt-get -y clean && \
@@ -43,18 +48,24 @@ COPY scripts/install-from-virtual-env /usr/local/bin/install-from-virtual-env
 # Install base packages from the virtual environment.
 RUN install-from-virtual-env basic
 RUN install-from-virtual-env python
-RUN install-from-virtual-env aws
-RUN install-from-virtual-env azure-cli
+#RUN install-from-virtual-env aws
+#RUN install-from-virtual-env azure-cli
 RUN install-from-virtual-env docker-compose
-RUN install-from-virtual-env nodejs
+#RUN install-from-virtual-env nodejs
+
+ENV RUSTUP_HOME=/opt/rust CARGO_HOME=/opt/cargo PATH=/opt/cargo/bin:$PATH
+RUN wget --https-only --secure-protocol=TLSv1_2 -O- https://sh.rustup.rs | sh /dev/stdin -y
+RUN chmod a+w /opt/cargo
+RUN chmod a+w /opt/rust
+
+
 
 # Install runner and its dependencies.
-RUN useradd -mr -d /home/runner runner && \
-    curl -sL "https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz" | tar xzvC /home/runner && \
-    /home/runner/bin/installdependencies.sh
+RUN useradd -mr -d /home/runner runner
 
 # Add sudo rule for runner user
 RUN echo "runner ALL= EXEC: NOPASSWD:ALL" >> /etc/sudoers.d/runner
+
 
 # Clean apt cache.
 RUN apt-get -y clean && \
