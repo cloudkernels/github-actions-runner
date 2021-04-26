@@ -5,6 +5,8 @@ on:
     - x86_64
   pull_request:
 
+  workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
