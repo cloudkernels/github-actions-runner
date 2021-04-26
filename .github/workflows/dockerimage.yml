@@ -2,15 +2,23 @@ name: Docker Image CI
 on:
   push:
     branches:
-    - master
+    - aarch64
   pull_request:
+
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: arm64
     steps:
     - uses: actions/checkout@v2
-    - uses: ludeeus/action-shellcheck@1.1.0
-    - uses: brpaz/hadolint-action@v1.4.0
-    - run: |
-        docker build .
+
+    - uses: mr-smithers-excellent/docker-build-push@v5
+      name: Build & push docker image
+      with:
+        image: github-actions-runner
+        tags: aarch64
+        registry: registry.nubificus.co.uk
+        dockerfile: Dockerfile
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
