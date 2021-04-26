@@ -12,7 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: ludeeus/action-shellcheck@1.1.0
-    #- uses: brpaz/hadolint-action@v1.4.0
-    - run: |
-        docker build . -t registry.nubificus.co.uk/github-actions-runner:x86_64
+
+    - uses: mr-smithers-excellent/docker-build-push@v5
+      name: Build & push docker image
+      with:
+        image: github-actions-runner
+        tags: x86_64
+        registry: registry.nubificus.co.uk
+        dockerfile: Dockerfile
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
