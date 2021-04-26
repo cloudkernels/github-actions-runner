@@ -2,7 +2,7 @@ name: Docker Image CI
 on:
   push:
     branches:
-    - master
+    - x86_64
   pull_request:
 
 jobs:
@@ -13,4 +13,4 @@ jobs:
     - uses: ludeeus/action-shellcheck@1.1.0
     - uses: brpaz/hadolint-action@v1.4.0
     - run: |
-        docker build .
+        docker build . -t registry.nubificus.co.uk/github-actions-runner:x86_64
